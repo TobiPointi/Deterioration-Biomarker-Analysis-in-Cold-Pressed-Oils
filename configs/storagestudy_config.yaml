@@ -1,0 +1,67 @@
+# Configuration for unified oil biomarker pipeline
+
+# Map table column names to numeric days
+timepoints over storage study:
+  T0: 0
+  T1: 3
+  T2: 7
+  T3: 14
+  T4: 28
+  T5: 42
+  T6: 56
+  T7: 84
+  T8: 112
+  T9: 168 (6 months)
+
+# Where outputs go
+results_dir: results
+
+# List your modality inputs
+modalities:
+  - name: polyphenols
+    file: data/polyphenols.xlsx
+    index_column: null          # set to column name if the features are NOT already the index
+    value_selector: null        # optional substring filter for data columns (e.g., "Mean")
+    assume_quantified: true
+    quantified_list: []
+
+  - name: fatty_acids
+    file: data/fatty_acids.xlsx
+    index_column: null
+    value_selector: null
+    assume_quantified: true
+    quantified_list: []
+
+  - name: gc_ms
+    file: data/gc_ms.xlsx
+    index_column: null
+    value_selector: "Mean"      # pick only columns containing 'Mean'
+    assume_quantified: false
+    quantified_list: ["Hexanal", "1-Hexanol", "2-Pentanone", "2-Heptanone"]  # example
+
+# Modeling hyperparameters
+modeling:
+  lasso_alpha: 0.001
+  rf_n_estimators: 1000
+  rf_random_state: 42
+
+# Aggregation to final score
+aggregation:
+  weights:
+    polyphenols: 1.0
+    fatty_acids: 1.0
+    gc_ms: 1.0
+  top_n: 30
+  min_modalities_required: 1   # allow features present in any single modality
+
+# Optional: figure settings
+figures:
+  dpi: 440
+  format: "png"     # also writes a pdf copy
+
+# Optional: weight methods within each modality (sums to 1.0)
+aggregation:
+  method_weights:
+    lasso: 0.4
+    rf: 0.4
+    correlation: 0.2
